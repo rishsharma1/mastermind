@@ -16,15 +16,31 @@ int main(int argc,char * argv[]) {
 	struct sockaddr_in server_address, client_address;
 	socklen_t len;
 	int port_number, clientfd, sockfd;
+	FILE *fp;
 
 	if(argc < NUMBER_OF_ARGUMENTS) {
 		fprintf(stderr, "Usage: ./server port_number [default_secert_code]\n");
 		exit(EXIT_FAILURE);
 	}
 
-	port_number = atoi(argv[1]);
+	/*Initialise the mutex*/
+	if(pthread_mutex_init(&lock,NULL) != 0) {
+		fprintf(stderr, "Mutex failed to initialise\n");
+		exit(EXIT_FAILURE);
+	}
 
+	port_number = atoi(argv[1]);
 	sockfd = init_server_socket(port_number,&server_address);
+
+	/* new log file */
+	fp = fopen(LOG_FILE,"w");
+
+	if(!fp) {
+		fprintf(stderr, "Error: Log file failed to create\n");
+		exit(EXIT_FAILURE);
+	}
+	fclose(fp);
+
 
 
 	/* Set the maximum number of connections, which is 20 in this case*/
@@ -46,14 +62,85 @@ int main(int argc,char * argv[]) {
 			perror("Accept failed");
 			exit(EXIT_FAILURE);
 		}
-		else {
-			char ip4[INET_ADDRSTRLEN];
-			inet_ntop(AF_INET,&(client_address.sin_addr),ip4,INET_ADDRSTRLEN);
-			printf("connection accepted from client %s\n",ip4);
+
+		/* create the client information data structure for the new client*/
+		client_data_t *client_data;
+		client_data = (client_data_t *)malloc(sizeof(*client_data));
+		assert(client_data != NULL);
+
+		/* initialise the data with information */
+		client_data->client_id = clientfd;
+		client_data->client_addr = client_address;
+		client_data->server_addr = server_address;
+		client_data->turns_left = MAX_TURNS;
+
+
+		/*log when client connects for the first time*/
+		log_on_connect(*client_data,fp);
+
+
+		/* Create this new thread*/
+		pthread_t thread_id;
+		if(pthread_create(&thread_id, NULL,test,(void *)3)) {
+			fprintf(stderr, "Failed to create thread.\n");
+			exit(EXIT_FAILURE);
 		}
+		/* Detach this thread */
+		if(pthread_detach(thread_id)) {
+			fprintf(stderr, "Failed to detach thead.\n");
+			exit(EXIT_FAILURE);
+		}
+
+
+
 	}
 
 	close(server_address);
 	return 1;
 
 }
+
+void *play_mastermind(void *data) {
+
+	client_data_t *client_data = (client_data_t *)data;
+	
+	int client_fd = client_data->client_id;
+
+}
+
+
+void get_current_time(char *time_now) {
+
+	time_t current = time(0);
+	strftime(time_now,TIME_SIZE,"%d %m %Y %H:%M:%S",localtime(&current));
+	
+}
+
+void get_client_ip(client_data_t data,char *ip4) {
+
+	inet_ntop(AF_INET,&(data.client_addr.sin_addr),ip4,INET_ADDRSTRLEN);
+
+}
+
+void log_on_connect(client_data_t data,FILE *fp) {
+
+
+	/* open the log file in append mode*/
+	fp = fopen(LOG_FILE, "a");
+	char time_now[TIME_SIZE];
+	char ip4[INET_ADDRSTRLEN];
+
+	get_current_time(time_now);
+	get_client_ip(data,ip4);
+
+	fprintf(fp, "[%s](%s)(%d) client connected\n",time_now,ip4,data.client_id);
+	fclose(fp);
+
+
+}
+
+
+
+
+
+

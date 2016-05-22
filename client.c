@@ -24,4 +24,5 @@ int main(int argc,char * argv[]) {
 
 	sockfd = init_client_socket(host,port_number);	
 
+	return 0;
 }
