@@ -14,4 +14,6 @@ const char  colours[] = {'A','B','C','D','E','F'};
 
 
 /*---------------Prototypes------------------------*/
+int correct_positions(char *guess,char *code);
+int is_valid(char *guess);
 /*-------------------------------------------------*/
