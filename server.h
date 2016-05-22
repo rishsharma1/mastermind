@@ -12,9 +12,11 @@
 
 /*----------------Definitions----------------------*/
 #define NUMBER_OF_ARGUMENTS 2
+#define MAX_CLIENTS 20
+#define TRUE 2
 /*-------------------------------------------------*/
 
 
 /*---------------Prototypes------------------------*/
-  
+int init_server_socket(int port_number, struct sockaddr_in *server_address);
 /*-------------------------------------------------*/

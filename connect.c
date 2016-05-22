@@ -27,6 +27,45 @@ int init_server_socket(int port_number, struct sockaddr_in *server_address) {
 		perror("ERROR on binding");
 		exit(EXIT_FAILURE);
 	} 
-	
+
 	return sockfd;
+}
+
+int init_client_socket(char *host,int port_number) {
+
+	int sockfd
+	struct hostent *server;
+	struct sockaddr_in server_address;
+
+	/* translate the hostname into peer's IP address */
+	server = gethostbyname(host);
+
+	if(!server) {
+		fprintf(stderr, "Unknown host %s\n",host);
+		exit(EXIT_FAILURE);
+	}
+
+	/* build data structures for the socket */
+	bzero((char *)&server_address,sizeof(server_address));
+	server_address.sin_family = AF_INET;
+	bcopy(server->h_addr,(char *)&server_address.sin_addr,server->h_length);
+	server_address.sin_port = htons(port_number);
+
+	/*creating a TCP socket*/
+	sockfd = socket(AF_INET,SOCK_STREAM,0);
+
+	if(sockfd < 0) {
+		perror("Error in creating a socket to the server");
+		exit(EXIT_FAILURE);
+	}
+
+	/*finally connect the socket to the host server */
+	if(connect(sockfd,(struct sockaddr *)&server_address,sizeof(server_address)) < 0) {
+		perror("Error in connecting to the host server");
+		close(sockfd);
+		exit(EXIT_FAILURE);
+	}
+
+	return sockfd;
+
 }
