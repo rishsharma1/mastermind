@@ -1,7 +1,22 @@
+/*------------------Details------------------------
+  Name: Rishabh Sharma
+  Student Number: 694739
+ -------------------------------------------------*/
 
 
-
+/*------------------Libraries---------------------*/
 #include "connect.h"
+/*------------------------------------------------*/
+
+
+
+/* ------------------Initialise server socket-----------------
+ * Initialises the server socket, which includes building the 
+ * data structures for the socket and then binding that socket
+ * to the address we create.
+ * Input: int port_number, sockaddr_in *server_address
+ * Output: socket_fd
+ *----------------------------------------------------------*/
 
 int init_server_socket(int port_number, struct sockaddr_in *server_address) {
 
@@ -9,7 +24,7 @@ int init_server_socket(int port_number, struct sockaddr_in *server_address) {
 
 
 	/*Creating a TCP socket*/
-	sockfd = socket(AF_NET,SOCK_STREAM,0);
+	sockfd = socket(AF_INET,SOCK_STREAM,0);
 
 	if(sockfd < 0) {
 		perror("ERROR opening socket");
@@ -33,7 +48,7 @@ int init_server_socket(int port_number, struct sockaddr_in *server_address) {
 
 int init_client_socket(char *host,int port_number) {
 
-	int sockfd
+	int sockfd;
 	struct hostent *server;
 	struct sockaddr_in server_address;
 
@@ -48,7 +63,7 @@ int init_client_socket(char *host,int port_number) {
 	/* build data structures for the socket */
 	bzero((char *)&server_address,sizeof(server_address));
 	server_address.sin_family = AF_INET;
-	bcopy(server->h_addr,(char *)&server_address.sin_addr,server->h_length);
+	bcopy((char *)server->h_addr,(char *)&server_address.sin_addr,server->h_length);
 	server_address.sin_port = htons(port_number);
 
 	/*creating a TCP socket*/

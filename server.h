@@ -4,9 +4,13 @@
 -------------------------------------------------*/
 
 /*------------------Libraries---------------------*/
+#ifndef SERVER_H
+#define SERVER_H
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
+#include "connect.h"
 /*-------------------------------------------------*/
 
 
@@ -18,5 +22,5 @@
 
 
 /*---------------Prototypes------------------------*/
-int init_server_socket(int port_number, struct sockaddr_in *server_address);
 /*-------------------------------------------------*/
+#endif

@@ -9,8 +9,6 @@
 
 
 
-
-
 int main(int argc,char * argv[]) {
 
 	int sockfd, port_number;
@@ -24,7 +22,6 @@ int main(int argc,char * argv[]) {
 	host = argv[1];
 	port_number = atoi(argv[2]);
 
-	sockfd = init_client_socket(host,port_number);
-	
+	sockfd = init_client_socket(host,port_number);	
 
 }

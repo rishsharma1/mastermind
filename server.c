@@ -5,7 +5,6 @@
 
 /*------------------Libraries---------------------*/
 #include "server.h"
-#include "connect.h"
 /*------------------------------------------------*/
 
 
@@ -25,7 +24,7 @@ int main(int argc,char * argv[]) {
 
 	port_number = atoi(argv[1]);
 
-	sockfd = init_server_connect(port_number,&server_address);
+	sockfd = init_server_socket(port_number,&server_address);
 
 
 	/* Set the maximum number of connections, which is 20 in this case*/
@@ -41,7 +40,7 @@ int main(int argc,char * argv[]) {
 	while(TRUE) {
 
 
-		clientfd = accept(sockfd,(struct socaddr*)&client_address,&len);
+		clientfd = accept(sockfd,(struct sockaddr *)&client_address,&len);
 
 		if(clientfd < 0) {
 			perror("Accept failed");
