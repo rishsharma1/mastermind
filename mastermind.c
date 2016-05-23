@@ -29,6 +29,12 @@ int main(int argc, char *argv[]) {
 	printf("guess: %s has %d correct positions\n",guess,correct_positions(guess,code));
 	printf("guess: %s has %d incorrect positions\n",guess,incorrect_positions(guess,code));
 
+	/*test random generation of codeword*/
+	char code_word[GUESS_LENGTH+1];
+	generate_codeword(code_word);
+
+	printf("random code word: %s\n",code_word);
+
 
 }
 
@@ -88,6 +94,11 @@ int correct_positions(char *guess,char *code) {
 	return correct_pos;
 }
 
+/* ---------------in array------------------------------------
+ * Checks if the number is in the array 
+ * Input: int *array, int size, int number
+ * Output: 1 if number is in array, 0 otherwise 
+ *----------------------------------------------------------*/
 int in_array(int *array, int size, int num) {
 
 	for(int i=0;i<size;i++) {
@@ -98,6 +109,12 @@ int in_array(int *array, int size, int num) {
 	return 0;
 } 
 
+/* ---------------Check for incorrect positions---------------
+ * Checks the guess, looking for characters in the guess that 
+ * are in the secret code but not in the right position
+ * Input: char *guess, char *code
+ * Output: number of characters that are in the incorrect positions 
+ *----------------------------------------------------------*/
 int incorrect_positions(char *guess,char *code) {
 
 	int incorrect_pos = 0;
@@ -112,14 +129,14 @@ int incorrect_positions(char *guess,char *code) {
 		}
 	}
 
-
 	for(int i=0;i<GUESS_LENGTH;i++) {
 
 		if(guess[i] != code[i]) {
 
 			for(int j=0;j<GUESS_LENGTH;j++) {
 
-				if(guess[i] == code[j] && !in_array(correct_index,correct,j)) {
+				if(guess[i] == code[j] && 
+				!in_array(correct_index,correct,j)) {
 					incorrect_pos++;
 					break;
 				}
@@ -128,6 +145,25 @@ int incorrect_positions(char *guess,char *code) {
 	}
 
 	return incorrect_pos;
+}
+
+
+/* ---------------generate codeword---------------------------
+ * Generates a random codeword that is within the constraints 
+ * Input: char *code
+ * Output: None 
+ *----------------------------------------------------------*/
+void generate_codeword(char *code) {
+
+	srand(time(NULL));
+	int num = 0;
+
+	while(num < GUESS_LENGTH) {
+
+		int index = rand() % MAX_COLOURS;
+		code[num++] = colours[index];
+	}
+	code[num] = NULL_BYTE;
 }
 
 
