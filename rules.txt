@@ -1,0 +1,17 @@
+Welcome to Mastermind.
+I will construct a 4 letter codeword from these letters {A,B,C,D,E,F}
+and it will be your job to guess my codeword.
+
+Rule 1: Your guess must be 4 characters long.
+Rule 2: Your guess must contain all uppercase characters.
+Rule 3: Each character in your guess must be in {A,B,C,D,E,F}.
+Rule 4: You must guess within 10 tries or less.
+
+Each time you make a valid guess, I will give you a hint.
+The hint will be in the format of [b:m]
+
+b = number of characters in your guess that are in the correct position
+m = number of characters that are within the codeword but not in the
+right positions in your guess.
+					  
+Good Luck!

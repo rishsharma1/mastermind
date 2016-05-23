@@ -22,7 +22,18 @@ int main(int argc,char * argv[]) {
 	host = argv[1];
 	port_number = atoi(argv[2]);
 
-	sockfd = init_client_socket(host,port_number);	
+	sockfd = init_client_socket(host,port_number);
+	/*get the rules from the server*/
+	get_rules(sockfd);
 
 	return 0;
 }
+
+void get_rules(int fd) {
+
+	char msg[RULES_LENGTH];
+
+	read(fd,msg,sizeof(msg));
+	printf("%s",msg );
+
+}	

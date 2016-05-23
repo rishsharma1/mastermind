@@ -10,34 +10,6 @@
 /*------------------------------------------------*/
 
 
-
-
-int main(int argc, char *argv[]) {
-
-	char guess[] = "FFFF";
-	char code[] = "FBEA";
-
-
-	printf("code: %s, guess: %s\n",code,guess);
-
-	if(is_valid(guess)) {
-		printf("%s is a valid guess\n",guess);
-	}
-	else {
-		printf("%s is a invalid guess\n",guess);
-	}
-	printf("guess: %s has %d correct positions\n",guess,correct_positions(guess,code));
-	printf("guess: %s has %d incorrect positions\n",guess,incorrect_positions(guess,code));
-
-	/*test random generation of codeword*/
-	char code_word[GUESS_LENGTH+1];
-	generate_codeword(code_word);
-
-	printf("random code word: %s\n",code_word);
-
-
-}
-
 /* ------------------Check for validity------------------------
  * Checks whether the guess made by the client is a valid guess.
  * If a input guess contains all uppercase letters that are 
@@ -48,6 +20,10 @@ int main(int argc, char *argv[]) {
  * Output: 1 for valid guess, 0 for invalid guess 
  *----------------------------------------------------------*/
 int is_valid(char *guess) {
+
+	if(strlen(guess) != GUESS_LENGTH) {
+		return 0;
+	}
 
 	for(int i=0;i<GUESS_LENGTH;i++) {
 

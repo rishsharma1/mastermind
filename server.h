@@ -13,18 +13,33 @@
 #include <time.h>
 #include <assert.h>
 #include "connect.h"
+#include "mastermind.h"
 /*-------------------------------------------------*/
 
 
 /*----------------Definitions----------------------*/
 #define NUMBER_OF_ARGUMENTS 2
 #define MAX_CLIENTS 20
-#define TRUE 2
+#define TRUE 1
 #define MAX_TURNS 10
 #define TIME_SIZE 128
 #define LOG_FILE "log.txt"
+static const char rules[] = "Welcome to Mastermind.\n\n"
+					  "I will construct a 4 letter codeword from these letters {A,B,C,D,E,F}\n"
+					  "and it will be your job to guess my codeword.\n\n" 
+					  "Rule 1: Your guess must be 4 characters long.\n"
+					  "Rule 2: Your guess must contain all uppercase characters.\n"
+					  "Rule 3: Each character in your guess must be in {A,B,C,D,E,F}.\n"
+					  "Rule 4: You must guess within 10 trys or less.\n\n"
+					  "Each time you make a valid guess, I will give you a hint.\n"
+					  "The hint will be in the format of [b:m]\n\n"
+					  "b = number of characters in your guess that are in the correct position\n"
+					  "m = number of characters that are within the codeword but not in the\n"
+					  "right positions in your guess.\n\n"
+					  "Good Luck!\n\n\n\n";
 
 pthread_mutex_t lock;
+char *default_code;
 
 
 typedef struct {
@@ -42,5 +57,6 @@ typedef struct {
 void log_on_connect(client_data_t data,FILE *fp);
 void get_current_time(char *time_now);
 void get_client_ip(client_data_t data,char *ip4);
+void *play_mastermind(void *data);
 /*-------------------------------------------------*/
 #endif

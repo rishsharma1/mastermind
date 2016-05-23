@@ -9,19 +9,27 @@
 
 
 
-
 int main(int argc,char * argv[]) {
-
 
 	struct sockaddr_in server_address, client_address;
 	socklen_t len;
 	int port_number, clientfd, sockfd;
 	FILE *fp;
+	default_code = NULL;
 
 	if(argc < NUMBER_OF_ARGUMENTS) {
 		fprintf(stderr, "Usage: ./server port_number [default_secert_code]\n");
 		exit(EXIT_FAILURE);
 	}
+	else if(argc == NUMBER_OF_ARGUMENTS + 1) {
+		default_code = argv[2];
+
+		if(!is_valid(default_code)) {
+			fprintf(stderr, "%s is not a valid code word\n",default_code);
+			exit(EXIT_FAILURE);
+		}
+	}
+
 
 	/*Initialise the mutex*/
 	if(pthread_mutex_init(&lock,NULL) != 0) {
@@ -77,20 +85,23 @@ int main(int argc,char * argv[]) {
 
 		/*log when client connects for the first time*/
 		log_on_connect(*client_data,fp);
+		/*send rules to client*/
+		write(clientfd,rules,sizeof(rules));	
 
 
 		/* Create this new thread*/
-		pthread_t thread_id;
+		/*pthread_t thread_id;
 		if(pthread_create(&thread_id, NULL,test,(void *)3)) {
 			fprintf(stderr, "Failed to create thread.\n");
 			exit(EXIT_FAILURE);
 		}
+		*/
 		/* Detach this thread */
-		if(pthread_detach(thread_id)) {
+		/*if(pthread_detach(thread_id)) {
 			fprintf(stderr, "Failed to detach thead.\n");
 			exit(EXIT_FAILURE);
 		}
-
+		*/
 
 
 	}
@@ -103,10 +114,31 @@ int main(int argc,char * argv[]) {
 void *play_mastermind(void *data) {
 
 	client_data_t *client_data = (client_data_t *)data;
-	
+
 	int client_fd = client_data->client_id;
+	char secret_code[GUESS_LENGTH+1];
+
+	/*generate a random code word or use default if provided*/
+	if(default_code != NULL) {
+
+		for(int i=0;i<GUESS_LENGTH;i++) {
+			secret_code[i] = default_code[i];
+		}
+		secret_code[GUESS_LENGTH] = NULL_BYTE;
+	}
+	else {
+		generate_codeword(secret_code);
+	}
+
+	/* play mastermind until the player runs out tries */
+	while(client_data->turns_left > 0) {
+
+	}
+
 
 }
+
+
 
 
 void get_current_time(char *time_now) {
@@ -135,8 +167,6 @@ void log_on_connect(client_data_t data,FILE *fp) {
 
 	fprintf(fp, "[%s](%s)(%d) client connected\n",time_now,ip4,data.client_id);
 	fclose(fp);
-
-
 }
 
 
