@@ -86,23 +86,25 @@ int main(int argc,char * argv[]) {
 		/*log when client connects for the first time*/
 		log_on_connect(*client_data,fp);
 		/*send rules to client*/
-		write(clientfd,rules,sizeof(rules));	
+		if(write(clientfd,RULES,sizeof(RULES)) < 0) {
+			perror("Error: Could not write to socket.\n");
+			exit(EXIT_FAILURE);
+		}
 
 
 		/* Create this new thread*/
-		/*pthread_t thread_id;
-		if(pthread_create(&thread_id, NULL,test,(void *)3)) {
+		pthread_t thread_id;
+		if(pthread_create(&thread_id, NULL,play_mastermind,(void *)client_data)) {
 			fprintf(stderr, "Failed to create thread.\n");
 			exit(EXIT_FAILURE);
 		}
-		*/
+		
 		/* Detach this thread */
-		/*if(pthread_detach(thread_id)) {
+		if(pthread_detach(thread_id)) {
 			fprintf(stderr, "Failed to detach thead.\n");
 			exit(EXIT_FAILURE);
 		}
-		*/
-
+		
 
 	}
 
@@ -117,6 +119,9 @@ void *play_mastermind(void *data) {
 
 	int client_fd = client_data->client_id;
 	char secret_code[GUESS_LENGTH+1];
+	char msg[MESSAGE_LENGTH];
+	char guess[CODE_LENGTH+1];
+	int player_win = 0, n, bufflen,datalen;
 
 	/*generate a random code word or use default if provided*/
 	if(default_code != NULL) {
@@ -130,9 +135,77 @@ void *play_mastermind(void *data) {
 		generate_codeword(secret_code);
 	}
 
+	printf("%s\n",secret_code);
 	/* play mastermind until the player runs out tries */
 	while(client_data->turns_left > 0) {
 
+		if(read(client_fd,(char*)&bufflen,sizeof(bufflen)) < 0) {
+			perror("Error: Could not read from socket.");
+			break;
+		}
+		bufflen = ntohl(bufflen);
+		if(read(client_fd,msg,bufflen) < 0) {
+			perror("Error: Could not read from socket.");
+			break;
+		}
+
+		parse_guess(msg,guess);
+		printf("%s\n",guess);
+		bzero(msg,MESSAGE_LENGTH);
+
+		if(!is_valid(guess)) {
+
+			datalen = strlen(INVALID);
+			int tmp = htonl(datalen);
+
+			if(write(client_fd,(char*)&tmp,sizeof(tmp)) < 0) {
+				perror("Error: Could not write to socket.\n");
+				exit(EXIT_FAILURE);
+			}
+
+			if(write(client_fd,msg,datalen) < 0) {
+				perror("Error: Could not write to socket.\n");
+				exit(EXIT_FAILURE);
+			}
+
+		}
+		else {
+
+			int correct = correct_positions(guess,secret_code);
+			int incorrect = incorrect_positions(guess,secret_code);
+
+			sprintf(msg,"[%d:%d]",correct,incorrect);
+			client_data->turns_left--;
+			printf("%s\n",msg );
+
+			/* Send the hint */
+			datalen = strlen(msg);
+			int tmp = htonl(datalen);
+
+			if(write(client_fd,(char*)&tmp,sizeof(tmp)) < 0) {
+				perror("Error: Could not write to socket.\n");
+				exit(EXIT_FAILURE);
+			}
+
+			if(write(client_fd,msg,datalen) < 0) {
+				perror("Error: Could not write to socket.\n");
+				exit(EXIT_FAILURE);
+			}
+
+			bzero(msg,MESSAGE_LENGTH);
+
+			if(correct == CODE_LENGTH) {
+				player_win = 1;
+				break;
+			}
+		}
+	}
+
+	if(player_win) {
+		n = write(client_fd,SUCCESS,sizeof(SUCCESS));
+	}
+	else {
+		n = write(client_fd,FAILURE,sizeof(FAILURE));
 	}
 
 
@@ -154,6 +227,7 @@ void get_client_ip(client_data_t data,char *ip4) {
 
 }
 
+
 void log_on_connect(client_data_t data,FILE *fp) {
 
 
@@ -167,6 +241,14 @@ void log_on_connect(client_data_t data,FILE *fp) {
 
 	fprintf(fp, "[%s](%s)(%d) client connected\n",time_now,ip4,data.client_id);
 	fclose(fp);
+}
+
+void parse_guess(char *msg, char *guess) {
+
+	for(int i=0;i<GUESS_LENGTH;i++) {
+		guess[i] = msg[i];
+	}
+	guess[CODE_LENGTH] = NULL_BYTE;
 }
 
 

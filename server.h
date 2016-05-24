@@ -24,7 +24,10 @@
 #define MAX_TURNS 10
 #define TIME_SIZE 128
 #define LOG_FILE "log.txt"
-static const char rules[] = "Welcome to Mastermind.\n\n"
+#define MESSAGE_LENGTH 25
+#define CODE_LENGTH 4
+
+static const char RULES[] = "Welcome to Mastermind.\n\n"
 					  "I will construct a 4 letter codeword from these letters {A,B,C,D,E,F}\n"
 					  "and it will be your job to guess my codeword.\n\n" 
 					  "Rule 1: Your guess must be 4 characters long.\n"
@@ -38,6 +41,10 @@ static const char rules[] = "Welcome to Mastermind.\n\n"
 					  "right positions in your guess.\n\n"
 					  "Good Luck!\n\n\n\n";
 
+static const char INVALID[] = "INVALID guess. Try Again.\0";
+static const char SUCCESS[] = "SUCCESS game over.\0";
+static const char FAILURE[] = "FAILURE game over.\0";
+ 
 pthread_mutex_t lock;
 char *default_code;
 
@@ -58,5 +65,6 @@ void log_on_connect(client_data_t data,FILE *fp);
 void get_current_time(char *time_now);
 void get_client_ip(client_data_t data,char *ip4);
 void *play_mastermind(void *data);
+void parse_guess(char *msg, char *guess);
 /*-------------------------------------------------*/
 #endif

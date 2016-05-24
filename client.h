@@ -14,7 +14,8 @@
 #define NUMBER_OF_ARGUMENTS 3
 #define TRUE 1
 #define RULES_LENGTH 642
-
+#define MESSAGE_LENGTH 25
+#define NULL_BYTE '\0'
 /*-------------------------------------------------*/
 
 
