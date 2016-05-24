@@ -11,7 +11,7 @@
 
 int main(int argc,char * argv[]) {
 
-	int sockfd = 0, port_number,n,bufflen,datalen;
+	int sockfd, port_number;
 	char *host;
 	char msg[MESSAGE_LENGTH];
 
@@ -27,40 +27,26 @@ int main(int argc,char * argv[]) {
 	sockfd = init_client_socket(host,port_number);
 	/*get the rules from the server*/
 	get_rules(sockfd);
+	printf("Enter your guess:");
 
 	while(fgets(msg,sizeof(msg),stdin)) {
 		
 
-		datalen = strlen(msg);
-		int tmp = htonl(datalen);
 
-		if(write(sockfd,(char*)&tmp,sizeof(tmp)) < 0) {
+		if(write(sockfd,msg,sizeof(msg)) < 0) {
 			perror("Error: Could not write to socket.\n");
 			exit(EXIT_FAILURE);
 		}
-
-		if(write(sockfd,msg,datalen) < 0) {
-			perror("Error: Could not write to socket.\n");
-			exit(EXIT_FAILURE);
-		}
-
 		bzero(msg,MESSAGE_LENGTH);
 
-
-		if(read(sockfd,(char*)&bufflen,sizeof(bufflen)) < 0) {
-			perror("Error: Could not read from socket.");
-			break;
+		if(read(sockfd,msg,sizeof(msg)) < 0) {
+			perror("Error: Could not read from socket.\n");
+			exit(EXIT_FAILURE);
 		}
+		printf("Message: %s, message_size: %d, message_length: %d\n",msg,sizeof(msg),strlen(msg));
 
-		bufflen = ntohl(bufflen);
+		printf("Enter your guess:");
 
-		if(read(sockfd,msg,bufflen) < 0) {
-			perror("Error: Could not read from socket.");
-			break;
-		}
-		sleep(1);
-
-		printf("%s\n",msg);
 		bzero(msg,MESSAGE_LENGTH);
 
 

@@ -24,7 +24,7 @@
 #define MAX_TURNS 10
 #define TIME_SIZE 128
 #define LOG_FILE "log.txt"
-#define MESSAGE_LENGTH 25
+#define MESSAGE_LENGTH 64
 #define CODE_LENGTH 4
 
 static const char RULES[] = "Welcome to Mastermind.\n\n"

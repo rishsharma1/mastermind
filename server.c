@@ -121,7 +121,7 @@ void *play_mastermind(void *data) {
 	char secret_code[GUESS_LENGTH+1];
 	char msg[MESSAGE_LENGTH];
 	char guess[CODE_LENGTH+1];
-	int player_win = 0, n, bufflen,datalen;
+	int player_win = 0, n;
 
 	/*generate a random code word or use default if provided*/
 	if(default_code != NULL) {
@@ -139,13 +139,7 @@ void *play_mastermind(void *data) {
 	/* play mastermind until the player runs out tries */
 	while(client_data->turns_left > 0) {
 
-		if(read(client_fd,(char*)&bufflen,sizeof(bufflen)) < 0) {
-			perror("Error: Could not read from socket.");
-			break;
-		}
-		bufflen = ntohl(bufflen);
-		if(read(client_fd,msg,bufflen) < 0) {
-			perror("Error: Could not read from socket.");
+		if(read(client_fd,msg,sizeof(msg)) < 0) {
 			break;
 		}
 
@@ -154,40 +148,24 @@ void *play_mastermind(void *data) {
 		bzero(msg,MESSAGE_LENGTH);
 
 		if(!is_valid(guess)) {
-
-			datalen = strlen(INVALID);
-			int tmp = htonl(datalen);
-
-			if(write(client_fd,(char*)&tmp,sizeof(tmp)) < 0) {
+			
+			if(write(client_fd,INVALID,sizeof(INVALID)) < 0) {
 				perror("Error: Could not write to socket.\n");
 				exit(EXIT_FAILURE);
 			}
-
-			if(write(client_fd,msg,datalen) < 0) {
-				perror("Error: Could not write to socket.\n");
-				exit(EXIT_FAILURE);
-			}
+			printf("%s\n",msg );
 
 		}
 		else {
 
+
 			int correct = correct_positions(guess,secret_code);
 			int incorrect = incorrect_positions(guess,secret_code);
-
 			sprintf(msg,"[%d:%d]",correct,incorrect);
 			client_data->turns_left--;
 			printf("%s\n",msg );
-
 			/* Send the hint */
-			datalen = strlen(msg);
-			int tmp = htonl(datalen);
-
-			if(write(client_fd,(char*)&tmp,sizeof(tmp)) < 0) {
-				perror("Error: Could not write to socket.\n");
-				exit(EXIT_FAILURE);
-			}
-
-			if(write(client_fd,msg,datalen) < 0) {
+			if(write(client_fd,msg,sizeof(msg)) < 0) {
 				perror("Error: Could not write to socket.\n");
 				exit(EXIT_FAILURE);
 			}
