@@ -42,8 +42,8 @@ static const char RULES[] = "Welcome to Mastermind.\n\n"
 					  "Good Luck!\n\n\n\n";
 
 static const char INVALID[] = "INVALID guess. Try Again.\0";
-static const char SUCCESS[] = "SUCCESS game over.\0";
-static const char FAILURE[] = "FAILURE game over.\0";
+static const char SUCCESS[] = "SUCCESS\0";
+static const char FAILURE[] = "FAILURE\0";
  
 pthread_mutex_t lock;
 char *default_code;

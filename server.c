@@ -86,10 +86,7 @@ int main(int argc,char * argv[]) {
 		/*log when client connects for the first time*/
 		log_on_connect(*client_data,fp);
 		/*send rules to client*/
-		if(write(clientfd,RULES,sizeof(RULES)) < 0) {
-			perror("Error: Could not write to socket.\n");
-			exit(EXIT_FAILURE);
-		}
+		write(clientfd,RULES,sizeof(RULES));
 
 
 		/* Create this new thread*/
@@ -144,16 +141,13 @@ void *play_mastermind(void *data) {
 		}
 
 		parse_guess(msg,guess);
-		printf("%s\n",guess);
 		bzero(msg,MESSAGE_LENGTH);
 
 		if(!is_valid(guess)) {
-			
+
 			if(write(client_fd,INVALID,sizeof(INVALID)) < 0) {
-				perror("Error: Could not write to socket.\n");
-				exit(EXIT_FAILURE);
+				break;
 			}
-			printf("%s\n",msg );
 
 		}
 		else {
@@ -161,21 +155,21 @@ void *play_mastermind(void *data) {
 
 			int correct = correct_positions(guess,secret_code);
 			int incorrect = incorrect_positions(guess,secret_code);
-			sprintf(msg,"[%d:%d]",correct,incorrect);
 			client_data->turns_left--;
-			printf("%s\n",msg );
+
+			sprintf(msg,"[%d:%d]. You have %d turns left.",correct,incorrect,client_data->turns_left);
 			/* Send the hint */
-			if(write(client_fd,msg,sizeof(msg)) < 0) {
-				perror("Error: Could not write to socket.\n");
-				exit(EXIT_FAILURE);
-			}
-
-			bzero(msg,MESSAGE_LENGTH);
-
 			if(correct == CODE_LENGTH) {
 				player_win = 1;
 				break;
 			}
+			else if(write(client_fd,msg,sizeof(msg)) < 0) {
+				break;
+			}
+
+			bzero(msg,MESSAGE_LENGTH);
+
+
 		}
 	}
 
@@ -186,7 +180,10 @@ void *play_mastermind(void *data) {
 		n = write(client_fd,FAILURE,sizeof(FAILURE));
 	}
 
+	close(client_fd);
+	free(client_data);
 
+	return NULL;
 }
 
 

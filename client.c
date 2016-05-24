@@ -35,22 +35,28 @@ int main(int argc,char * argv[]) {
 
 		if(write(sockfd,msg,sizeof(msg)) < 0) {
 			perror("Error: Could not write to socket.\n");
-			exit(EXIT_FAILURE);
+			break;
 		}
 		bzero(msg,MESSAGE_LENGTH);
 
 		if(read(sockfd,msg,sizeof(msg)) < 0) {
 			perror("Error: Could not read from socket.\n");
-			exit(EXIT_FAILURE);
+			break;
 		}
-		printf("Message: %s, message_size: %d, message_length: %d\n",msg,sizeof(msg),strlen(msg));
+		printf("%s\n",msg);
 
+		if(strcmp(msg,SUCCESS) == 0 || strcmp(msg,FAILURE) == 0) {
+			break;
+		} 
 		printf("Enter your guess:");
 
 		bzero(msg,MESSAGE_LENGTH);
 
 
 	}
+
+	close(sockfd);
+	
 	return 0;
 }
 

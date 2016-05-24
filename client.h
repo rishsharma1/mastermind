@@ -16,6 +16,9 @@
 #define RULES_LENGTH 700
 #define MESSAGE_LENGTH 64
 #define NULL_BYTE '\0'
+
+static const char SUCCESS[] = "SUCCESS\0";
+static const char FAILURE[] = "FAILURE\0";
 /*-------------------------------------------------*/
 
 
