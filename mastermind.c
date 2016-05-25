@@ -21,11 +21,12 @@
  *----------------------------------------------------------*/
 int is_valid(char *guess) {
 
+	int i,j;
 	if(strlen(guess) != GUESS_LENGTH) {
 		return 0;
 	}
 
-	for(int i=0;i<GUESS_LENGTH;i++) {
+	for(i=0;i<GUESS_LENGTH;i++) {
 
 		int valid_flag = 0;
 
@@ -33,7 +34,7 @@ int is_valid(char *guess) {
 			return 0;
 		}
 
-		for(int j=0;j<MAX_COLOURS;j++) {
+		for(j=0;j<MAX_COLOURS;j++) {
 
 			if(guess[i] == colours[j]) {
 				valid_flag = 1;
@@ -58,9 +59,9 @@ int is_valid(char *guess) {
  *----------------------------------------------------------*/
 int correct_positions(char *guess,char *code) {
 
-	int correct_pos = 0;
+	int correct_pos = 0,i;
 
-	for(int i=0;i<GUESS_LENGTH;i++) {
+	for(i=0;i<GUESS_LENGTH;i++) {
 
 		if(guess[i] == code[i]) {
 			correct_pos++;
@@ -76,8 +77,10 @@ int correct_positions(char *guess,char *code) {
  * Output: 1 if number is in array, 0 otherwise 
  *----------------------------------------------------------*/
 int in_array(int *array, int size, int num) {
+	
+	int i;
 
-	for(int i=0;i<size;i++) {
+	for(i=0;i<size;i++) {
 		if(array[i] == num) {
 			return 1;
 		}
@@ -93,23 +96,23 @@ int in_array(int *array, int size, int num) {
  *----------------------------------------------------------*/
 int incorrect_positions(char *guess,char *code) {
 
-	int incorrect_pos = 0;
+	int incorrect_pos = 0,i,j;
 	int correct_index[GUESS_LENGTH];
 	int correct = 0;
 
 	/* keeps track of the correct positions */
-	for(int i=0;i<GUESS_LENGTH;i++) {
+	for(i=0;i<GUESS_LENGTH;i++) {
 
 		if(guess[i] == code[i]) {
 			correct_index[correct++] = i;
 		}
 	}
 
-	for(int i=0;i<GUESS_LENGTH;i++) {
+	for(i=0;i<GUESS_LENGTH;i++) {
 
 		if(guess[i] != code[i]) {
 
-			for(int j=0;j<GUESS_LENGTH;j++) {
+			for(j=0;j<GUESS_LENGTH;j++) {
 
 				if(guess[i] == code[j] && 
 				!in_array(correct_index,correct,j)) {

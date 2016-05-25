@@ -7,6 +7,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 #include "connect.h"
+#include <signal.h>
 /*-------------------------------------------------*/
 
 
@@ -19,11 +20,14 @@
 
 static const char SUCCESS[] = "SUCCESS\0";
 static const char FAILURE[] = "FAILURE\0";
+
+int sockfd;
 /*-------------------------------------------------*/
 
 
 /*---------------Prototypes------------------------*/
 void get_rules(int fd);
+void sig_handler(int sig);
 /*-------------------------------------------------*/
 #endif
 

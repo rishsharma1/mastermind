@@ -9,9 +9,11 @@
 
 
 
+
+
 int main(int argc,char * argv[]) {
 
-	int sockfd, port_number;
+	int port_number;
 	char *host;
 	char msg[MESSAGE_LENGTH];
 
@@ -33,13 +35,13 @@ int main(int argc,char * argv[]) {
 		
 
 
-		if(write(sockfd,msg,sizeof(msg)) < 0) {
+		if(write(sockfd,msg,sizeof(msg)) <= 1) {
 			perror("Error: Could not write to socket.\n");
 			break;
 		}
 		bzero(msg,MESSAGE_LENGTH);
 
-		if(read(sockfd,msg,sizeof(msg)) < 0) {
+		if(read(sockfd,msg,sizeof(msg)) <= 1) {
 			perror("Error: Could not read from socket.\n");
 			break;
 		}
@@ -54,11 +56,11 @@ int main(int argc,char * argv[]) {
 
 
 	}
-
 	close(sockfd);
 	
 	return 0;
 }
+
 
 void get_rules(int fd) {
 
@@ -67,4 +69,4 @@ void get_rules(int fd) {
 	read(fd,msg,sizeof(msg));
 	printf("%s",msg );
 
-}	
+}

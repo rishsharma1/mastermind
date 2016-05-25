@@ -47,6 +47,8 @@ static const char FAILURE[] = "FAILURE\0";
  
 pthread_mutex_t lock;
 char *default_code;
+FILE *fp;
+
 
 
 typedef struct {
@@ -61,10 +63,13 @@ typedef struct {
 
 
 /*---------------Prototypes------------------------*/
-void log_on_connect(client_data_t data,FILE *fp);
+void log_on_connect(client_data_t data,char *secret_code);
 void get_current_time(char *time_now);
 void get_client_ip(client_data_t data,char *ip4);
 void *play_mastermind(void *data);
 void parse_guess(char *msg, char *guess);
+void get_server_ip(client_data_t data, char *ip4);
+void log_guess(client_data_t data, char *guess, int correct,int incorrect);
+void log_end_game(client_data_t data, int win);
 /*-------------------------------------------------*/
 #endif

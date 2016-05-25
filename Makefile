@@ -18,6 +18,7 @@ connect.o:
 mastermind.o:
 	$(CC) $(CFLAGS) -c mastermind.c
 
+
 server: connect.o mastermind.o
 	$(CC) $(CFLAGS) -o server server.c connect.o mastermind.o -pthread
 
