@@ -47,6 +47,7 @@ int main(int argc,char * argv[]) {
 		}
 		printf("%s\n",msg);
 
+		/* end the client if we get a SUCCESS or FAILURE message from the server*/
 		if(strcmp(msg,SUCCESS) == 0 || strcmp(msg,FAILURE) == 0) {
 			break;
 		} 

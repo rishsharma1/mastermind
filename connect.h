@@ -22,7 +22,8 @@
 
 
 /*---------------Prototypes------------------------*/
-int init_server_socket(int port_number, struct sockaddr_in *server_address);
+int init_server_socket(int port_number, 
+struct sockaddr_in *server_address);
 int init_client_socket(char *host,int port_number);
 /*-------------------------------------------------*/
 #endif

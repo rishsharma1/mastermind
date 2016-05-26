@@ -38,7 +38,9 @@ int init_server_socket(int port_number, struct sockaddr_in *server_address) {
 	server_address->sin_port = htons(port_number);
 
 	/*Now we need to bind the socket to the address we created */
-	if(bind(sockfd, (struct sockaddr *)server_address, sizeof(*server_address)) < 0) {
+	if(bind(sockfd, (struct sockaddr *)server_address, 
+		sizeof(*server_address)) < 0) {
+
 		perror("ERROR on binding");
 		exit(EXIT_FAILURE);
 	} 
@@ -46,6 +48,14 @@ int init_server_socket(int port_number, struct sockaddr_in *server_address) {
 	return sockfd;
 }
 
+
+/* ------------------Initialise client socket-----------------
+ * Initialises the client socket, which includes building the 
+ * data structures for the socket and then connecting the socket
+ * to the host server.
+ * Input: char *host, int port_number
+ * Output: socket_fd
+ *------------------------------------------------------------*/
 int init_client_socket(char *host,int port_number) {
 
 	int sockfd;
@@ -63,7 +73,8 @@ int init_client_socket(char *host,int port_number) {
 	/* build data structures for the socket */
 	bzero((char *)&server_address,sizeof(server_address));
 	server_address.sin_family = AF_INET;
-	bcopy((char *)server->h_addr,(char *)&server_address.sin_addr,server->h_length);
+	bcopy((char *)server->h_addr,(char *)&server_address.sin_addr,
+	server->h_length);
 	server_address.sin_port = htons(port_number);
 
 	/*creating a TCP socket*/
@@ -75,7 +86,9 @@ int init_client_socket(char *host,int port_number) {
 	}
 
 	/*finally connect the socket to the host server */
-	if(connect(sockfd,(struct sockaddr *)&server_address,sizeof(server_address)) < 0) {
+	if(connect(sockfd,(struct sockaddr *)&server_address,
+		sizeof(server_address)) < 0) {
+
 		perror("Error in connecting to the host server");
 		close(sockfd);
 		exit(EXIT_FAILURE);

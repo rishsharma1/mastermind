@@ -3,17 +3,17 @@
   Student Number: 694739
 -------------------------------------------------*/
 
-/*------------------Libraries---------------------*/
 #ifndef SERVER_H
 #define SERVER_H
+/*------------------Libraries---------------------*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
-#include <time.h>
 #include <assert.h>
 #include "connect.h"
 #include "mastermind.h"
+#include "logger.h"
 /*-------------------------------------------------*/
 
 
@@ -22,35 +22,38 @@
 #define MAX_CLIENTS 20
 #define TRUE 1
 #define MAX_TURNS 10
-#define TIME_SIZE 128
-#define LOG_FILE "log.txt"
 #define MESSAGE_LENGTH 64
 #define CODE_LENGTH 4
 
+/* The rules that get sent everytime a client connects*/
 static const char RULES[] = "Welcome to Mastermind.\n\n"
-					  "I will construct a 4 letter codeword from these letters {A,B,C,D,E,F}\n"
-					  "and it will be your job to guess my codeword.\n\n" 
-					  "Rule 1: Your guess must be 4 characters long.\n"
-					  "Rule 2: Your guess must contain all uppercase characters.\n"
-					  "Rule 3: Each character in your guess must be in {A,B,C,D,E,F}.\n"
-					  "Rule 4: You must guess within 10 trys or less.\n\n"
-					  "Each time you make a valid guess, I will give you a hint.\n"
-					  "The hint will be in the format of [b:m]\n\n"
-					  "b = number of characters in your guess that are in the correct position\n"
-					  "m = number of characters that are within the codeword but not in the\n"
-					  "right positions in your guess.\n\n"
-					  "Good Luck!\n\n\n\n";
+"I will construct a 4 letter codeword from these letters {A,B,C,D,E,F}\n"
+"and it will be your job to guess my codeword.\n\n" 
+"Rule 1: Your guess must be 4 characters long.\n"
+"Rule 2: Your guess must contain all uppercase characters.\n"
+"Rule 3: Each character in your guess must be in {A,B,C,D,E,F}.\n"
+"Rule 4: You must guess within 10 trys or less.\n\n"
+"Each time you make a valid guess, I will give you a hint.\n"
+"The hint will be in the format of [b:m]\n\n"
+"b = number of characters in your guess that are in the correct position\n"
+"m = number of characters that are within the codeword but not in the\n"
+"right positions in your guess.\n\n"
+"Good Luck!\n\n\n\n";
 
+/* invalid message */
 static const char INVALID[] = "INVALID guess. Try Again.\0";
+/* success message */
 static const char SUCCESS[] = "SUCCESS\0";
+/* failure message */
 static const char FAILURE[] = "FAILURE\0";
- 
+
+/* mutal exclusion lock*/
 pthread_mutex_t lock;
+/* default code word */
 char *default_code;
-FILE *fp;
 
 
-
+/* stores information about the connected client */
 typedef struct {
 
 	int client_id;
@@ -63,13 +66,10 @@ typedef struct {
 
 
 /*---------------Prototypes------------------------*/
-void log_on_connect(client_data_t data,char *secret_code);
-void get_current_time(char *time_now);
 void get_client_ip(client_data_t data,char *ip4);
 void *play_mastermind(void *data);
 void parse_guess(char *msg, char *guess);
 void get_server_ip(client_data_t data, char *ip4);
-void log_guess(client_data_t data, char *guess, int correct,int incorrect);
-void log_end_game(client_data_t data, int win);
+
 /*-------------------------------------------------*/
 #endif
