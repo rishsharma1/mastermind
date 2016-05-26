@@ -6,14 +6,17 @@
 #ifndef SERVER_H
 #define SERVER_H
 /*------------------Libraries---------------------*/
+#include <signal.h>
+#include "connect.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
 #include <assert.h>
-#include "connect.h"
 #include "mastermind.h"
 #include "logger.h"
+#include <sys/time.h>
+#include <sys/resource.h>
 /*-------------------------------------------------*/
 
 
@@ -52,6 +55,10 @@ pthread_mutex_t lock;
 /* default code word */
 char *default_code;
 
+/*resource usage stats*/
+struct rusage usage;
+struct timeval start,end;
+
 
 /* stores information about the connected client */
 typedef struct {
@@ -62,14 +69,16 @@ typedef struct {
 	struct sockaddr_in client_addr;
 
 }client_data_t;
+
+
+
 /*-------------------------------------------------*/
 
 
 /*---------------Prototypes------------------------*/
-void get_client_ip(client_data_t data,char *ip4);
 void *play_mastermind(void *data);
 void parse_guess(char *msg, char *guess);
-void get_server_ip(client_data_t data, char *ip4);
+void sig_handler(int sig_flag);
 
 /*-------------------------------------------------*/
 #endif

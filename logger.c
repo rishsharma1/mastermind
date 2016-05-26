@@ -25,6 +25,14 @@ void init_log_file() {
 	fclose(fp);
 }
 
+void init_log_statistics() {
+
+	/*initialise the statistics data structure */
+	statistics = (stats_t *)malloc(sizeof(*statistics));
+	assert(statistics != NULL);
+	statistics->wins = 0;
+	statistics->clients_connected = 0;
+}
 
 /* ---------------log on connect--------------------------------
  * Logs the guess each time client guesses, including the hint 
@@ -126,6 +134,35 @@ void log_on_connect(int client_id,char *ip4_client,char *ip4_server,
 
 }
 
+
+/* ---------------log invlaid guess--------------------------
+ * logs the invalid guess 
+ *----------------------------------------------------------*/
+void log_invalid_guess(int client_id,char *ip4_client, 
+	pthread_mutex_t *lock) {
+
+	/* protect the critcal section */
+	pthread_mutex_lock(lock);
+
+	/* open the log file in append mode*/
+	fp = fopen(LOG_FILE, "a");
+
+	/* buffer for time*/
+	char time_now[TIME_SIZE];
+
+
+	/* grab the time*/
+	get_current_time(time_now);
+
+	fprintf(fp, "[%s](%s)(soc_id %d) INVALID guess\n",
+	time_now,ip4_client,client_id);
+	fclose(fp);
+
+	pthread_mutex_unlock(lock);
+
+
+}
+
 /* ---------------get current time---------------------------
  * Gets the current time 
  * Input: char *time_now
@@ -138,4 +175,53 @@ void get_current_time(char *time_now) {
 	localtime(&current));
 	
 }
+
+
+void log_stats(pthread_mutex_t *lock) {
+
+	/* protect the critcal section */
+	pthread_mutex_lock(lock);
+
+	FILE *pid_file;
+	int pid = getpid();
+	char proc_path[PATH_SIZE];
+	char stats[PATH_SIZE];
+	proc_path[PATH_SIZE-1] = NULL_BYTE;
+
+
+	sprintf(proc_path,"cat /proc/%d/status | grep Vm",pid);
+	/* open the log file in append mode*/
+	fp = fopen(LOG_FILE, "a");
+
+	pid_file = popen(proc_path,"r");
+
+	if(pid_file == NULL) {
+		printf("popen() failed.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	while(fgets(stats,sizeof(stats),pid_file) != 0 ) {
+		printf("%s\n",stats);
+	}
+
+	fprintf(fp, "\nStatistics: \n\n");
+	fprintf(fp, "Clients connected: %d\n",statistics->clients_connected);
+	fprintf(fp, "Total wins: %d\n",statistics->wins);
+
+	fclose(fp);
+
+	pthread_mutex_unlock(lock);
+
+}
+
+void increment_wins() {
+	statistics->wins++;
+}
+
+void increment_clients() {
+	statistics->clients_connected++;
+}
+
+
+
 

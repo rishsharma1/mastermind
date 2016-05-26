@@ -16,6 +16,19 @@ int main(int argc,char * argv[]) {
 	int port_number, clientfd = 0, sockfd;
 	default_code = NULL;
 
+
+	getrusage(RUSAGE_SELF,&usage);
+	start = usage.ru_utime;
+
+	init_log_statistics();
+
+	if (signal(SIGINT, sig_handler) == SIG_ERR) {
+ 		printf("\ncan't catch SIGINT\n");
+ 	}
+ 	if (signal(SIGTERM, sig_handler) == SIG_ERR) {
+ 		printf("\ncan't catch SIGTERM\n");
+ 	}
+
 	if(argc < NUMBER_OF_ARGUMENTS) {
 		fprintf(stderr, "Usage: ./server port_number [default_secert_code]\n");
 		exit(EXIT_FAILURE);
@@ -62,6 +75,9 @@ int main(int argc,char * argv[]) {
 			perror("Accept failed");
 			exit(EXIT_FAILURE);
 		}
+		else {
+			increment_clients();
+		}
 
 		/* create the client information data structure for the new client*/
 		client_data_t *client_data;
@@ -95,7 +111,7 @@ int main(int argc,char * argv[]) {
 
 	}
 
-	close(server_address);
+	close(sockfd);
 	return 1;
 
 }
@@ -126,8 +142,13 @@ void *play_mastermind(void *data) {
 	int player_win = 0,i;
 
 	/* get the server and client IP's*/
-	get_server_ip(*client_data,ip4_server);
-	get_client_ip(*client_data,ip4_client);
+	inet_ntop(AF_INET,&(client_data->client_addr.sin_addr),
+	ip4_client,INET_ADDRSTRLEN);
+
+	inet_ntop(AF_INET,&(client_data->server_addr.sin_addr),
+	ip4_server,INET_ADDRSTRLEN);
+
+
 
 	/*generate a random code word or use default if provided*/
 	if(default_code != NULL) {
@@ -161,9 +182,13 @@ void *play_mastermind(void *data) {
 		/*check if the guess is valid*/
 		if(!is_valid(guess)) {
 
+			client_data->turns_left--;
+			log_invalid_guess(client_fd,ip4_client,&lock);
+
 			if(write(client_fd,INVALID,sizeof(INVALID)) <= 1) {
 				break;
 			}
+
 
 		}
 		else {
@@ -184,6 +209,7 @@ void *play_mastermind(void *data) {
 			/* Send the hint */
 			if(correct == CODE_LENGTH) {
 				player_win = 1;
+				increment_wins();
 				break;
 			}
 			else if(client_data->turns_left == 0) {
@@ -199,6 +225,7 @@ void *play_mastermind(void *data) {
 		}
 	}
 
+	bzero(msg,MESSAGE_LENGTH);
 	/* Send SUCCESS message to client if it guesses the codeword
 	correctly, otherwise send a FAILURE message */
 	if(player_win) {
@@ -206,7 +233,10 @@ void *play_mastermind(void *data) {
 
 	}
 	else {
+		sprintf(msg,"The secret code was %s",
+		secret_code);
 		write(client_fd,FAILURE,sizeof(FAILURE));
+		write(client_fd,msg,sizeof(msg));
 	}
 
 	/*log the outcome of the game */
@@ -219,29 +249,6 @@ void *play_mastermind(void *data) {
 	return NULL;
 }
 
-
-/* ---------------get client ip------------------------------
- * gets the client ip
- * Input: client_data_t data, char *ip4
- * Output: None 
- *----------------------------------------------------------*/
-void get_client_ip(client_data_t data,char *ip4) {
-
-	inet_ntop(AF_INET,&(data.client_addr.sin_addr),
-	ip4,INET_ADDRSTRLEN);
-
-}
-
-/* ---------------get server ip------------------------------
- * gets the server ip
- * Input: client_data_t data, char *ip4
- * Output: None 
- *----------------------------------------------------------*/
-void get_server_ip(client_data_t data, char *ip4) {
-
-	inet_ntop(AF_INET,&(data.server_addr.sin_addr),
-	ip4,INET_ADDRSTRLEN);
-}
 
 /* ---------------parse guess---------------------------------
  * Only take the first 4 characters of the msg recieved from 
@@ -257,6 +264,23 @@ void parse_guess(char *msg, char *guess) {
 		guess[i] = msg[i];
 	}
 	guess[CODE_LENGTH] = NULL_BYTE;
+}
+
+void sig_handler(int sig_flag) {
+
+	if(sig_flag == SIGINT || sig_flag == SIGTERM) {
+
+		getrusage(RUSAGE_SELF,&usage);
+		end = usage.ru_utime;
+
+		printf("Started at: %ld.%lds\n",start.tv_sec,start.tv_usec);
+		printf("Ended at: %ld.%lds\n",end.tv_sec,end.tv_usec);
+		printf("Shared memory: %ld\n",usage.ru_ixrss );
+		printf("%ld\n",usage.ru_maxrss);
+
+		log_stats(&lock);
+		exit(EXIT_SUCCESS);
+	}
 }
 
 
