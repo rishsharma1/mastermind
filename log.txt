@@ -1,8 +1,9 @@
-
-Statistics: 
-
-Clients connected: 0
-Total wins: 0
-
-User CPU time used: 0.38s
-System CPU time used: 0.139s
+[27 05 2016 13:22:52](0.0.0.0)(4) client connected
+[27 05 2016 13:22:52](0.0.0.0) server secret = CFAC
+[27 05 2016 13:23:07](0.0.0.0)(soc_id 4) client's guess = CAFA
+[27 05 2016 13:23:07](0.0.0.0) server's hint = [1:2]
+[27 05 2016 13:27:15](0.0.0.0)(soc_id 4) client's guess = CFAA
+[27 05 2016 13:27:15](0.0.0.0) server's hint = [3:0]
+[27 05 2016 13:27:39](0.0.0.0)(soc_id 4) client's guess = CFAC
+[27 05 2016 13:27:39](0.0.0.0) server's hint = [4:0]
+[27 05 2016 13:27:39](0.0.0.0)(soc_id 4) SUCCESS game over.

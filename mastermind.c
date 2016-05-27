@@ -117,7 +117,7 @@ int incorrect_positions(char *guess,char *code) {
 				if(guess[i] == code[j] && 
 				!in_array(correct_index,correct,j)) {
 					incorrect_pos++;
-					break;
+					correct_index[correct++] = j;
 				}
 			}
 		}
