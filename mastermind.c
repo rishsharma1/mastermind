@@ -100,6 +100,8 @@ int incorrect_positions(char *guess,char *code) {
 	int correct_index[GUESS_LENGTH];
 	int correct = 0;
 
+	/*BEDB*/
+
 	/* keeps track of the correct positions */
 	for(i=0;i<GUESS_LENGTH;i++) {
 
@@ -118,6 +120,7 @@ int incorrect_positions(char *guess,char *code) {
 				!in_array(correct_index,correct,j)) {
 					incorrect_pos++;
 					correct_index[correct++] = j;
+					break;
 				}
 			}
 		}
