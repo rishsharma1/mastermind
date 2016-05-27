@@ -19,6 +19,7 @@ int main(int argc,char * argv[]) {
 
 	getrusage(RUSAGE_SELF,&usage);
 	start = usage.ru_utime;
+	start_s = usage.ru_stime;
 
 	init_log_statistics();
 
@@ -266,19 +267,21 @@ void parse_guess(char *msg, char *guess) {
 	guess[CODE_LENGTH] = NULL_BYTE;
 }
 
+/* ---------------sig handler--------------------------------
+ * Handles the SIGINT and SIGTERM flags, where if they occur
+ * it will first write some server statistics before finally
+ * exiting the server.
+ *----------------------------------------------------------*/
 void sig_handler(int sig_flag) {
 
 	if(sig_flag == SIGINT || sig_flag == SIGTERM) {
 
 		getrusage(RUSAGE_SELF,&usage);
 		end = usage.ru_utime;
+		end_s = usage.ru_stime;
 
-		printf("Started at: %ld.%lds\n",start.tv_sec,start.tv_usec);
-		printf("Ended at: %ld.%lds\n",end.tv_sec,end.tv_usec);
-		printf("Shared memory: %ld\n",usage.ru_ixrss );
-		printf("%ld\n",usage.ru_maxrss);
-
-		log_stats(&lock);
+		log_stats(&lock,end.tv_sec-start.tv_sec,end.tv_usec-start.tv_usec,
+			end_s.tv_sec-start_s.tv_sec,end_s.tv_usec-start_s.tv_usec);
 		exit(EXIT_SUCCESS);
 	}
 }

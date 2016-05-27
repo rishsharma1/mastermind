@@ -176,13 +176,20 @@ void get_current_time(char *time_now) {
 	
 }
 
-
-void log_stats(pthread_mutex_t *lock) {
+/* ---------------log statistics-------------------------------
+ * The server program logs server stats to the log.txt, holding
+ * information regarding the number of clients connected, wins,
+ * time, virtual memory information. 
+ *----------------------------------------------------------*/
+void log_stats(pthread_mutex_t *lock, long sec, long usec,
+	long sec_s, long usec_s) {
 
 	/* protect the critcal section */
 	pthread_mutex_lock(lock);
 
 	FILE *pid_file;
+	
+	/*process id for this process*/
 	int pid = getpid();
 	char proc_path[PATH_SIZE];
 	char stats[PATH_SIZE];
@@ -193,6 +200,7 @@ void log_stats(pthread_mutex_t *lock) {
 	/* open the log file in append mode*/
 	fp = fopen(LOG_FILE, "a");
 
+	/* open proc file path*/
 	pid_file = popen(proc_path,"r");
 
 	if(pid_file == NULL) {
@@ -200,13 +208,16 @@ void log_stats(pthread_mutex_t *lock) {
 		exit(EXIT_FAILURE);
 	}
 
-	while(fgets(stats,sizeof(stats),pid_file) != 0 ) {
-		printf("%s\n",stats);
-	}
-
+	/* record the stats to the log.txt file*/
 	fprintf(fp, "\nStatistics: \n\n");
 	fprintf(fp, "Clients connected: %d\n",statistics->clients_connected);
-	fprintf(fp, "Total wins: %d\n",statistics->wins);
+	fprintf(fp, "Total wins: %d\n\n",statistics->wins);
+	fprintf(fp, "User CPU time used: %ld.%lds\n",sec,usec);
+	fprintf(fp, "System CPU time used: %ld.%lds\n",sec_s,usec_s);
+
+	while(fgets(stats,sizeof(stats),pid_file) != 0 ) {
+		fprintf(fp, "%s",stats);
+	}
 
 	fclose(fp);
 
@@ -214,10 +225,17 @@ void log_stats(pthread_mutex_t *lock) {
 
 }
 
+/* ---------------increment wins------------------------------
+ * The function is responsible for updating the wins count.
+ *----------------------------------------------------------*/
 void increment_wins() {
 	statistics->wins++;
 }
 
+/* ---------------increment clients---------------------------
+ * The function is responsible for updating the count of 
+ * client's connected to the server 
+ *----------------------------------------------------------*/
 void increment_clients() {
 	statistics->clients_connected++;
 }

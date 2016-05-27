@@ -58,7 +58,7 @@ char *default_code;
 /*resource usage stats*/
 struct rusage usage;
 struct timeval start,end;
-
+struct timeval start_s,end_s;
 
 /* stores information about the connected client */
 typedef struct {

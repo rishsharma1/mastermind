@@ -48,7 +48,8 @@ char *secret_code, pthread_mutex_t *lock);
 void get_current_time(char *time_now);
 void log_invalid_guess(int client_id,char *ip4_client, 
 	pthread_mutex_t *lock);
-void log_stats(pthread_mutex_t *lock);
+void log_stats(pthread_mutex_t *lock, long sec, long usec,
+	long sec_s, long usec_s);
 void increment_wins();
 void increment_clients();
 void init_log_statistics();

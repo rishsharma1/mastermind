@@ -10,7 +10,6 @@
 
 
 
-
 int main(int argc,char * argv[]) {
 
 	int port_number;
@@ -35,13 +34,14 @@ int main(int argc,char * argv[]) {
 	while(fgets(msg,sizeof(msg),stdin)) {
 		
 
-
+		/*send your guess to the server*/
 		if(write(sockfd,msg,sizeof(msg)) <= 1) {
 			perror("Error: Could not write to socket.\n");
 			break;
 		}
 		bzero(msg,MESSAGE_LENGTH);
-
+		
+		/*recieve feedback from the server */
 		if(read(sockfd,msg,sizeof(msg)) <= 1) {
 			perror("Error: Could not read from socket.\n");
 			break;
@@ -73,12 +73,18 @@ int main(int argc,char * argv[]) {
 	return 0;
 }
 
-
+/* ---------------get rules-----------------------------------
+ * initially the server will send the rules, this function will
+ * read those rules and print them. 
+ *----------------------------------------------------------*/
 void get_rules(int fd) {
 
 	char msg[RULES_LENGTH];
 
-	read(fd,msg,sizeof(msg));
+	if(read(fd,msg,sizeof(msg)) <= 1) {
+		perror("Error: Could not read from socket.\n");
+
+	}
 	printf("%s",msg );
 
 }
